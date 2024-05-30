@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Modal from 'react-modal';
 import './App.css';
 import ArrowUp from './icons/ArrowUp';
 import ArrowDown from './icons/ArrowDown';
@@ -35,6 +36,7 @@ const App: React.FC = () => {
   const [selectAllDisabled, setSelectAllDisabled] = useState(false);
   const [deselectAllDisabled, setDeselectAllDisabled] = useState(true);
   const [submitDisabled, setSubmitDisabled] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleParentChange = (parentIndex: number, checked: boolean) => {
     const newParentChecked = [...parentChecked];
@@ -74,83 +76,103 @@ const App: React.FC = () => {
 
   const handleSubmit = () => {
     alert('Submitted!');
+    closeModal();
   };
 
   const handleCancel = () => {
     alert('Cancelled!');
+    closeModal();
+  };
+
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
   };
 
   useEffect(() => {
     const allSelected = parentChecked.every(Boolean);
-    const noneSelected = parentChecked.every((checked) => !checked);
-    const anySelected = parentChecked.some(Boolean);
+    const noneSelected = parentChecked.every((checked) => !checked) && childChecked.flat().every((checked) => !checked);
+    const anySelected = parentChecked.some(Boolean) || childChecked.flat().some(Boolean);
 
     setSelectAllDisabled(allSelected);
     setDeselectAllDisabled(noneSelected);
     setSubmitDisabled(!anySelected);
-  }, [parentChecked]);
+  }, [parentChecked, childChecked]);
 
   return (
       <div>
-        <div className="control-buttons">
-          <div
-              className={`button ${selectAllDisabled ? 'disabled' : ''}`}
-              onClick={!selectAllDisabled ? selectAll : undefined}
-              style={{ marginRight: '10px' }}
-          >
-            Select All
-          </div>
-          <div
-              className={`button ${deselectAllDisabled ? 'disabled' : ''}`}
-              onClick={!deselectAllDisabled ? deselectAll : undefined}
-          >
-            Deselect All
-          </div>
-        </div>
-        {parentChecked.map((checked, parentIndex) => (
-            <div key={parentIndex}>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <Checkbox
-                    label={`Parent Checkbox ${parentIndex + 1}`}
-                    checked={checked}
-                    onChange={(checked) => handleParentChange(parentIndex, checked)}
-                    id={`parent-checkbox-${parentIndex}`}
-                />
-                <div
-                    className="button"
-                    onClick={() => toggleExpandCollapse(parentIndex)}
-                    style={{ marginLeft: '10px' }}
-                >
-                  {isExpanded[parentIndex] ? <ArrowUp /> : <ArrowDown />}
-                </div>
-              </div>
-              {isExpanded[parentIndex] && (
-                  <div style={{ marginLeft: 20 }}>
-                    {childChecked[parentIndex].map((checked, childIndex) => (
-                        <Checkbox
-                            key={childIndex}
-                            label={`Child Checkbox ${parentIndex + 1}-${childIndex + 1}`}
-                            checked={checked}
-                            onChange={(checked) => handleChildChange(parentIndex, childIndex, checked)}
-                            id={`child-checkbox-${parentIndex}-${childIndex}`}
-                        />
-                    ))}
-                  </div>
-              )}
+        <button onClick={openModal}>Open Modal</button>
+        <Modal
+            isOpen={isModalOpen}
+            onRequestClose={closeModal}
+            contentLabel="Checkbox Modal"
+            ariaHideApp={false}
+            className="modal"
+            overlayClassName="overlay"
+        >
+          <div className="control-buttons">
+            <div
+                className={`button ${selectAllDisabled ? 'disabled' : ''}`}
+                onClick={!selectAllDisabled ? selectAll : undefined}
+                style={{ marginRight: '10px' }}
+            >
+              Select All
             </div>
-        ))}
-        <div className="action-buttons">
-          <div
-              className={`button ${submitDisabled ? 'disabled' : ''}`}
-              onClick={!submitDisabled ? handleSubmit : undefined}
-              style={{ marginRight: '10px' }}
-          >
-            Submit
+            <div
+                className={`button ${deselectAllDisabled ? 'disabled' : ''}`}
+                onClick={!deselectAllDisabled ? deselectAll : undefined}
+            >
+              Deselect All
+            </div>
           </div>
-          <div className="button" onClick={handleCancel}>
-            Cancel
+          {parentChecked.map((checked, parentIndex) => (
+              <div key={parentIndex}>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <Checkbox
+                      label={`Parent Checkbox ${parentIndex + 1}`}
+                      checked={checked}
+                      onChange={(checked) => handleParentChange(parentIndex, checked)}
+                      id={`parent-checkbox-${parentIndex}`}
+                  />
+                  <div
+                      className="button"
+                      onClick={() => toggleExpandCollapse(parentIndex)}
+                      style={{ marginLeft: '10px' }}
+                  >
+                    {isExpanded[parentIndex] ? <ArrowUp /> : <ArrowDown />}
+                  </div>
+                </div>
+                {isExpanded[parentIndex] && (
+                    <div style={{ marginLeft: 20 }}>
+                      {childChecked[parentIndex].map((checked, childIndex) => (
+                          <Checkbox
+                              key={childIndex}
+                              label={`Child Checkbox ${parentIndex + 1}-${childIndex + 1}`}
+                              checked={checked}
+                              onChange={(checked) => handleChildChange(parentIndex, childIndex, checked)}
+                              id={`child-checkbox-${parentIndex}-${childIndex}`}
+                          />
+                      ))}
+                    </div>
+                )}
+              </div>
+          ))}
+          <div className="action-buttons">
+            <div
+                className={`button ${submitDisabled ? 'disabled' : ''}`}
+                onClick={!submitDisabled ? handleSubmit : undefined}
+                style={{ marginRight: '10px' }}
+            >
+              Submit
+            </div>
+            <div className="button" onClick={handleCancel}>
+              Cancel
+            </div>
           </div>
-        </div>
+        </Modal>
       </div>
   );
 };
