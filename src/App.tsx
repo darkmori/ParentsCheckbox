@@ -3,27 +3,7 @@ import Modal from 'react-modal';
 import './App.css';
 import ArrowUp from './icons/ArrowUp';
 import ArrowDown from './icons/ArrowDown';
-
-interface CheckboxProps {
-  label: string;
-  checked: boolean;
-  onChange: (checked: boolean) => void;
-  id: string;
-}
-
-const Checkbox: React.FC<CheckboxProps> = ({ label, checked, onChange, id }) => {
-  return (
-      <div>
-        <input
-            type="checkbox"
-            id={id}
-            checked={checked}
-            onChange={(e) => onChange(e.target.checked)}
-        />
-        <label htmlFor={id}>{label}</label>
-      </div>
-  );
-};
+import Checkbox from './Checkbox';
 
 const App: React.FC = () => {
   const [parentChecked, setParentChecked] = useState([false, false, false]);

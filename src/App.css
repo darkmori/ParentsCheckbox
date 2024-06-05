@@ -31,6 +31,7 @@ div {
 
 label {
   cursor: pointer;
+  margin-left: 8px;
 }
 
 .action-buttons {
@@ -62,4 +63,15 @@ label {
   right: 0;
   bottom: 0;
   background-color: rgba(0,0,0,0.5);
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.checkbox-icon {
+  width: 20px;
+  height: 20px;
 }
